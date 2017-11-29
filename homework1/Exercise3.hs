@@ -6,7 +6,7 @@ wall, ground, box, storage :: Picture
 wall = colored green (solidRectangle 1 1)
 ground = colored yellow (solidRectangle 1 1)
 box = colored brown (solidRectangle 1 1 )
-storage = colored black (solidRectangle 1 1)
+storage =  colored black (solidCircle 0.1) & ground
 
 
 drawTile :: Integer -> Picture
@@ -16,7 +16,8 @@ drawTile x =
             2 -> ground
             3 -> storage
             _ -> box
-                     
+                       
+
 
 maze :: Integer -> Integer -> Integer
 maze x y
@@ -27,14 +28,24 @@ maze x y
   | x >= -2 && y == 0        = 4
   | otherwise                = 2
   
+  
 
-drawMaze :: Integer -> Integer -> Picture
-drawMaze 4 y = drawTile (maze 4 y)
-drawMaze x (-4) = drawTile (maze x (-4))
-drawMaze x y = drawTile (maze x y) & translated 0 (-1) (drawMaze x (y-1)) & translated 1 0 (drawMaze (x+1) (y))
+drawColumn :: Integer -> Integer -> Picture
+drawColumn 11 _ = blank
+drawColumn x y = drawTile (maze x y) & translated 1 0 ( drawColumn (x+1) y)
+
+
+drawLine :: Integer -> Picture
+drawLine 11 = blank
+drawLine y = translated 0 (-1) (( drawColumn 0 y ) & drawLine (y+1))
+
+
+drawMaze :: Picture
+drawMaze = translated (-5) 5 (drawLine (0))
 
 pictureOfMaze :: Picture
-pictureOfMaze = translated (-4) 4 (drawMaze (-4) 4)
+pictureOfMaze = drawMaze 
+
 
 main :: IO ()
 main = drawingOf pictureOfMaze
