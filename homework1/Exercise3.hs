@@ -31,17 +31,17 @@ maze x y
   
 
 drawColumn :: Integer -> Integer -> Picture
-drawColumn 11 _ = blank
+drawColumn 5 _ = blank
 drawColumn x y = drawTile (maze x y) & translated 1 0 ( drawColumn (x+1) y)
 
 
 drawLine :: Integer -> Picture
-drawLine 11 = blank
-drawLine y = translated 0 (-1) (( drawColumn 0 y ) & drawLine (y+1))
+drawLine 5 = blank
+drawLine y = translated 0 (-1) (( drawColumn (-4) y ) & drawLine (y+1))
 
 
 drawMaze :: Picture
-drawMaze = translated (-5) 5 (drawLine (0))
+drawMaze = translated ( -5) 5 (drawLine (-4))
 
 pictureOfMaze :: Picture
 pictureOfMaze = drawMaze 
