@@ -1,0 +1,77 @@
+{-# LANGUAGE OverloadedStrings #-}
+{- most of this code can be found in https://www.seas.upenn.edu/%7Ecis194/fall16/lectures/02-ho-datatypes.html -}
+
+import CodeWorld
+
+wall, ground, box, storage, player :: Picture
+wall = colored green (solidRectangle 1 1)
+ground = colored yellow (solidRectangle 1 1)
+box = colored brown (solidRectangle 1 1 )
+storage =  colored black (solidCircle 0.1) & ground
+player =  colored brown (solidCircle 0.3) & ground
+
+data Tile = Wall | Ground | Storage | Box | Player
+data Coord = C Integer Integer
+
+drawTileAt :: Integer -> Integer -> Picture
+drawTileAt r c = translated (fromIntegral r) (fromIntegral c) (drawTile (maze r c))
+
+drawTile :: Tile -> Picture
+drawTile x =
+        case x of
+            Wall -> wall
+            Ground -> ground
+            Storage -> storage
+            Box -> box
+            Player -> player
+                       
+
+
+maze :: Integer -> Integer -> Tile
+maze x y
+  | abs x > 4  || abs y > 4  = Box
+  | abs x == 4 || abs y == 4 = Wall
+  | x ==  2 && y <= 0        = Wall
+  | x ==  3 && y <= 0        = Storage
+  | x >= -2 && y == 0        = Box
+  | otherwise                = Ground
+  
+  
+draw21Tiles :: ( Integer -> Picture ) -> Picture
+draw21Tiles something = go (-4)
+    where 
+      go :: Integer -> Picture
+      go 5 = blank
+      go n = something n & go (n+1)
+      
+pictureOfMaze :: Picture
+pictureOfMaze = draw21Tiles (\r -> draw21Tiles (\c -> (drawTileAt r c)))
+
+initialCoord :: Coord
+initialCoord = C (-2) (-2)
+
+atCoord :: Coord -> Picture -> Picture
+atCoord (C x y) pic = translated (fromIntegral x) (fromIntegral y) pic
+
+drawPlayer :: Picture
+drawPlayer = atCoord initialCoord (drawTile Player)
+  
+{-
+drawColumn :: Integer -> Integer -> Picture
+drawColumn 5 _ = blank
+drawColumn x y = drawTile (maze x y) & translated 1 0 ( drawColumn (x+1) y)
+
+
+drawLine :: Integer -> Picture
+drawLine 5 = blank
+drawLine y = translated 0 (-1) (( drawColumn (-4) y ) & drawLine (y+1))
+
+
+drawMaze :: Picture
+drawMaze = translated ( -5) 5 (drawLine (-4))
+-}
+
+
+
+main :: IO ()
+main = drawingOf pictureOfMaze
