@@ -64,13 +64,24 @@ adjacentCoord L (C x y) = C (x-1) y
 adjacentCoord D (C x y) = C  x   (y-1)
 
 handleEvent :: Event -> Coord -> Coord
-handleEvent (KeyPress key) c
-    | key == "Right" = adjacentCoord R c
-    | key == "Up"    = adjacentCoord U c
-    | key == "Left"  = adjacentCoord L c
-    | key == "Down"  = adjacentCoord D c
-handleEvent _ c      = c
+handleEvent (KeyPress key) (C x y)
+    | key == "Right" = handleBarrier2 (C x y) (adjacentCoord R (C x y)) (handleBarrier (adjacentCoord R (C x y))) 
+    | key == "Up"    = handleBarrier2 (C x y) (adjacentCoord U (C x y)) (handleBarrier (adjacentCoord U (C x y))) 
+    | key == "Left"  = handleBarrier2 (C x y) (adjacentCoord L (C x y)) (handleBarrier (adjacentCoord L (C x y))) 
+    | key == "Down"  = handleBarrier2 (C x y) (adjacentCoord D (C x y)) (handleBarrier (adjacentCoord D (C x y))) 
+handleEvent _ (C x y)     = (C x y) 
 
+{-fk gambiarra-}
+handleBarrier :: Coord -> Tile
+handleBarrier (C x y) = maze x y
+
+handleBarrier2 :: Coord -> Coord -> Tile -> Coord
+handleBarrier2 c b t =
+        case t of 
+            Wall -> c
+            Box -> c
+            _ -> b
+  
   
 main = interactionOf initialCoord handleTime handleEvent drawState
 
@@ -80,5 +91,3 @@ handleTime _ c = c
 
 drawState :: Coord -> Picture
 drawState c = drawPlayer c & pictureOfMaze 
-
-
