@@ -31,7 +31,7 @@ drawTile x =
 maze :: Integer -> Integer -> Tile
 maze x y
   | abs x > 4  || abs y > 4  = Box
-  | abs x == 4 || abs y == 4 = Wall
+  | abs x == 10 || abs y == 10 = Wall
   | x ==  2 && y <= 0        = Wall
   | x ==  3 && y <= 0        = Storage
   | x >= -2 && y == 0        = Box
@@ -39,17 +39,17 @@ maze x y
   
   
 draw21Tiles :: ( Integer -> Picture ) -> Picture
-draw21Tiles something = go (-4)
+draw21Tiles something = go (-10)
     where 
       go :: Integer -> Picture
-      go 5 = blank
+      go 11 = blank
       go n = something n & go (n+1)
       
 pictureOfMaze :: Picture
 pictureOfMaze = draw21Tiles (\r -> draw21Tiles (\c -> (drawTileAt r c)))
 
 initialCoord :: Coord
-initialCoord = C (-2) (-2)
+initialCoord = C 0 0
 
 atCoord :: Coord -> Picture -> Picture
 atCoord (C x y) pic = translated (fromIntegral x) (fromIntegral y) pic
@@ -69,7 +69,11 @@ handleEvent (KeyPress key) (C x y)
     | key == "Up"    = handleBarrier2 (C x y) (adjacentCoord U (C x y)) (handleBarrier (adjacentCoord U (C x y))) 
     | key == "Left"  = handleBarrier2 (C x y) (adjacentCoord L (C x y)) (handleBarrier (adjacentCoord L (C x y))) 
     | key == "Down"  = handleBarrier2 (C x y) (adjacentCoord D (C x y)) (handleBarrier (adjacentCoord D (C x y))) 
-handleEvent _ (C x y)     = (C x y) 
+    | key == "Esc"   = initialCoord
+handleEvent _ (C x y)= (C x y) 
+
+
+
 
 {-fk gambiarra-}
 handleBarrier :: Coord -> Tile
@@ -81,9 +85,12 @@ handleBarrier2 c b t =
             Wall -> c
             Box -> c
             _ -> b
-  
-  
-main = interactionOf initialCoord handleTime handleEvent drawState
+            
+exercise1 :: IO () 
+exercise1 = interactionOf initialCoord handleTime handleEvent drawState
+            
+
+main = exercise1
 
 handleTime :: Double -> Coord -> Coord
 handleTime _ c = c
