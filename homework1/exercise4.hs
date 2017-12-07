@@ -30,7 +30,7 @@ drawTile x =
 
 maze :: Integer -> Integer -> Tile
 maze x y
-  | abs x > 4  || abs y > 4  = Box
+  | abs x > 10  || abs y > 10  = Box
   | abs x == 10 || abs y == 10 = Wall
   | x ==  2 && y <= 0        = Wall
   | x ==  3 && y <= 0        = Storage
